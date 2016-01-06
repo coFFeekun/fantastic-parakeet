@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link   th:href="@{/css/materialize.min.css}" rel="stylesheet"/>
+
+    <link th:href="@{/js/handlers.js}" rel="script" />
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+</head>
+<body>
+
+
+<form id="login" onsubmit="return  submitForm()">
+    Benutzername:
+    <input type="text" name="benutzername"/>
+    <br/>
+    Passwort:
+    <input type="text" name="passwort"/>
+
+</form>
+<button type="submit"   form="login" value="submit">Einloggen</button>
+
+<div id="warning">
+  <p th:text="${session.name}" ></p>
+
+    <a href="/hund">click me</a>
+</div>
+
+
+</body>
+</html>
