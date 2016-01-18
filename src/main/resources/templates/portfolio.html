@@ -1,14 +1,170 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <script th:src="@{/js/handlers.js}" ></script>
+    <script th:src="@{/js/handlers.js}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <link th:href="@{/css/materialize.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/own.css}" rel="stylesheet"/>
+    <script th:src="@{/js/materialize.min.js}"></script>
+    <script th:src="@{/js/jquery.form.js}"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
     <meta charset="UTF-8"/>
-    <title>Title</title>
+    <title>Börsenspiel</title>
 </head>
 <body>
-<p th:text="${session.name}" ></p><p th:text="${session.money}"  ></p>
 
-<table id="portfolioTabelle"></table>
+<div class="z-depth-2" id="header">
+
+    <div class="row">
+        <div id="borse" class="col s2 red lighten-3 flow text">
+            <p id="borsetitel"><i class="tiny material-icons">trending_up</i> <h6 id="titel">Börsenspiel</h6> </p>
+        </div>
+        <div class="col s1">
+            Benutzer
+            <div th:text="${session.benutzer}"></div>
+
+        </div>
+        <div class="col s1">
+            Kapital
+            <div th:text="${session.money}"></div>
+        </div>
+        <div class="col s8">
+            <ul class="tabs">
+                <li class="tab col s3 "><a class="active" href="#portfolioTabelle">Ihr Portfolio</a></li>
+                <li class="tab col s3 "><a href="#transaction">Ihre Transaktionen</a></li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="all">
+
+    <div class="row">
+
+        <div id="portfolioTabelle" class="col s12  z-depth-2">
+
+        </div>
+        <div id="transaction" class="col s12  z-depth-2">
+            <h3>Transaktionen</h3>
+            <table id="transaktionenTabelle"></table>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="fixed-action-btn horizontal click-to-toggle" style="bottom: 45px; right: 24px;">
+    <a class="btn-floating btn-large red">
+        <i class="large material-icons">mode_edit</i>
+    </a>
+    <ul>
+        <li><a onclick="$('#kaufModal').openModal()" class="btn-floating red"><i class="tiny material-icons">add</i></a>
+        </li>
+        <li><a onclick="logout()" class="btn-floating red lighten-3"><i class="tiny material-icons">lock_outline</i></a>
+        </li>
+    </ul>
+</div>
+
+<div id="show"></div>
+
+<!--  Start des Modals -->
+<div id="Modal" class="modal">
+    <div class="modal-content">
+        <h4 id="titelModal">Atktien verkaufen</h4>
+
+
+        <form id='verkaufen' action='/updatePortfolio' method='get'>
+        </form>
+    </div>
+    <div class="modal-footer">
+
+        <button type="submit" form="verkaufen" class="waves-effect waves-light btn red">Verkaufen</button>
+    </div>
+</div>
+
+<div id="kaufModal" class="modal">
+    <div class="modal-content">
+        <h4 id="kaufTitel">Aktien kaufen</h4>
+
+        <form id="kaufen" action="/updatePortfolio">
+            <div class="input-field">
+            <input id="namei" type="text" title="Aktienname" name="aktienname" value=""/>
+                <label for="namei">Aktiensymbol</label>
+            </div>
+            <div class="input-field">
+            <input id="zahli" type="number" title="Anzahl" name="anzahl" value=""/><label for="zahli">Anzahl</label>
+            </div>
+            <input type="hidden" name="id" value="0"/>
+            <input type="hidden" name="typ" value="KAUFEN"/>
+
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <button class="waves-effect waves-light btn red" onclick="$('#kaufModal').closeModal()" type="submit"
+                form="kaufen">Kaufen
+        </button>
+
+    </div>
+</div>
+
+<script> $(document).ready(function () {
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $('.Modal').leanModal();
+});
+$(document).ready(function () {
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $('.kaufModal').leanModal();
+
+});
+
+$("#kaufen").ajaxForm({
+    url: '/updatePortfolio', type: 'post', success: function (result) {
+        if (result == "Diese Aktien gibt es nicht") {
+
+
+        } else if (result == "Sie haben zu wenig Geld") {
+
+        } else {
+            saveInput();
+            savePositiveTransaktion();
+            show(result, reload());
+        }
+
+
+    }
+
+});
+
+$("#verkaufen").ajaxForm({
+    url: '/updatePortfolio', type: 'post', success: function (result) {
+
+        $('#Modal').closeModal()
+        saveAnzahl()
+        saveTransaktion();
+        show(result, reload());
+
+
+    }
+});
+function reload() {
+    window.location.href = "/userui";
+
+}
+function show(showings, callback) {
+    document.getElementById("show").innerHTML = showings;
+    callback();
+}
+
+$(document).ready(function () {
+    $('input#input_text, textarea#textarea1').characterCounter();
+});
+
+
+portfolio();
+</script>
+
 </body>
 </html>
